@@ -8,7 +8,6 @@ namespace Models
 {
     public class DroneResponse
     {
-        public string DroneReference { get; set; }
         public string Status { get; set; }
         public string Remarks { get; set; }
 

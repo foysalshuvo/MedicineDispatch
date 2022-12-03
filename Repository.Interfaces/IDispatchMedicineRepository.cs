@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Repository.Interfaces
 {
-    public interface IDroneRepository
+    public interface IDispatchMedicineRepository
     {
-        Response Create(Drone drone);
+        Response Create(DispatchMedicine droneRegistration);
     }
 }

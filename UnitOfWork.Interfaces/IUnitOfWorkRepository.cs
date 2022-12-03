@@ -10,5 +10,6 @@ namespace UnitOfWork.Interfaces
     public interface IUnitOfWorkRepository
     {
         IDroneRepository DronesRepository { get; }
+        IDispatchMedicineRepository DispatchMedicineRepository { get; }
     }
 }

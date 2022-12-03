@@ -21,11 +21,9 @@ namespace AutoWrapper.Wrappers
 
         public object Data { get; set; }
 
-        public string ResponseToken { get; set; }
-
 
         [JsonConstructor]
-        public ApiResponse(string message, object result = null, int statusCode = 200, string apiVersion = "1.0.0.0", string responseToken = null)
+        public ApiResponse(string message, object result = null, int statusCode = 200, string apiVersion = "1.0.0.0")
         {
             this.Version = apiVersion;
             this.ResponseStatus = true;
@@ -33,8 +31,7 @@ namespace AutoWrapper.Wrappers
             this.ResponseTime = DateTime.Now;
             this.ResponseMessage = message;
             this.Data = result;
-            this.ResponseToken = responseToken;
-
+          
         }
 
         public ApiResponse(object result, int statusCode = 200)

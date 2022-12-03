@@ -278,6 +278,26 @@ namespace UnitOfWork.SqlHelper
             return lastId;
         }
 
+        public void InsertDetails(SqlCommand cmd, List<SqlParameter> parameters)
+        {
+            try
+            {
+                string vMsg = string.Empty;
+                if (parameters != null)
+                {
+                    foreach (var parameter in parameters)
+                    {
+                        cmd.Parameters.Add(parameter);
+                    }
+                }
+                cmd.CommandTimeout = 300;  // 5 Min
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
 
         public void InsertWithTransaction(string commandText, CommandType commandType, SqlParameter[] parameters)
         {

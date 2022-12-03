@@ -33,6 +33,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddTransient<IUnitOfWork, UnitOfWorkSqlServer>();
 builder.Services.AddTransient<IDroneService, DroneService>();
+builder.Services.AddTransient<IDispatchMedicineService, DispatchMedicineService>();
+
 builder.Services.AddMvc(options =>
 {
     options.FormatterMappings.SetMediaTypeMappingForFormat

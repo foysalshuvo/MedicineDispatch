@@ -2,31 +2,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnitOfWork.Interfaces;
 
 namespace Services.Drones
 {
-    public interface IDroneService
+    public interface IDispatchMedicineService
     {
-        Response Create(Drone drone);
+        Response DispatchMedicine(DispatchMedicine droneRegistration);
     }
-    public class DroneService: IDroneService
+    
+    public class DispatchMedicineService: IDispatchMedicineService
     {
         private IUnitOfWork _unitOfWork;
 
-        public DroneService(IUnitOfWork unitOfWork)
+        public DispatchMedicineService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public Response Create(Drone drone)
+        public Response DispatchMedicine(DispatchMedicine droneRegistration)
         {
             using (var context = _unitOfWork.Create())
             {
-                var result = context.Repositories.DronesRepository.Create(drone);
+                var result = context.Repositories.DispatchMedicineRepository.Create(droneRegistration);
                 context.SaveChanges();
                 return result;
             }

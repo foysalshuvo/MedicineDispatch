@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CommonEnum\CommonEnum.csproj" />
     <ProjectReference Include="..\Repository.Interfaces\Repository.Interfaces.csproj" />
     <ProjectReference Include="..\UnitOfWork.SqlHelper\UnitOfWork.SqlHelper.csproj" />
   </ItemGroup>

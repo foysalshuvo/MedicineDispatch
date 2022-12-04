@@ -1,7 +1,9 @@
 ﻿using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using Models;
 using Services.Drones;
 using System.Data.SqlTypes;
@@ -134,6 +136,27 @@ namespace MedicineDispatch.Controllers
                 return new ApiResponse(ex.Message);
             }
         }
+
+
+        [HttpPatch("UpdateDispatchInformation")]
+        public ApiResponse UpdateDispatchInformation(string dispatchCode, int droneId, int droneState, double batterPercentage)
+        {
+            try
+            {
+                var vResult = _iDispatchMedicineService.UpdateDispatchInformation(dispatchCode,droneId, droneState, batterPercentage);
+                var json = JsonSerializer.Serialize(vResult);
+                string combindedString = string.Join(",", json);
+                _logger.LogInformation("Response msg: " + combindedString);
+                return new ApiResponse("Request Successful", vResult, Convert.ToInt16(HttpStatusCode.OK), "1.0.0.0");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return new ApiResponse(Convert.ToInt16(HttpStatusCode.BadRequest), (ex.Message));
+            }
+        }
+
+
 
         //[HttpGet("GetMedicineInformationsByDrone")]
         //public ApiResponse GetMedicineInformationsByDrone(int droneId)

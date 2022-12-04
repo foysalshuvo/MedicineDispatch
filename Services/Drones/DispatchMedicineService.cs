@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using UnitOfWork.Interfaces;
+using static CommonEnum.CommonEnum;
 using static System.Net.WebRequestMethods;
 
 namespace Services.Drones
@@ -13,9 +14,10 @@ namespace Services.Drones
     public interface IDispatchMedicineService
     {
         Response DispatchMedicine(DispatchMedicine droneRegistration);
+        Response UpdateDispatchInformation(string dispatchCode, int droneId, int droneState, double batteryPercentage);
     }
-    
-    public class DispatchMedicineService: IDispatchMedicineService
+
+    public class DispatchMedicineService : IDispatchMedicineService
     {
         private IUnitOfWork _unitOfWork;
 
@@ -24,9 +26,14 @@ namespace Services.Drones
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        ///  Description : This method is responsible for dispatching medication items 
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <param name="dispatchMedicine"></param>
+        /// <returns></returns>
         public Response DispatchMedicine(DispatchMedicine dispatchMedicine)
         {
-            bool isDispatchInformationValid = false;
 
             using (var context = _unitOfWork.Create())
             {
@@ -40,49 +47,143 @@ namespace Services.Drones
                     response.Remarks = "Drone not found";
                     return response;
                 }
-                else 
+                else
                 {
-                    // Checking Medinine weight 
-                    // Med weight < drone weight
-                    double medicineWeightInTotal = 0;
-                    if (dispatchMedicine.Medications.Count > 0)
+                    if (IsProvidedDroneIsIdle(drone.Id))
                     {
-                        medicineWeightInTotal = GetMedicineWeightInTotal(dispatchMedicine.Medications);
-                    }
-                    else 
-                    {
-                        Response response = new Response();
-                        response.Status = String.Empty;
-                        response.Remarks = "Medicines are not found";
-                        return response;
-                    }
+                        // Checking Medications weight 
+                        // Med weight < drone weight
+                        double medicineWeightInTotal = 0;
+                        if (dispatchMedicine.Medications.Count > 0)
+                        {
+                            medicineWeightInTotal = GetMedicationsWeightInTotal(dispatchMedicine.Medications);
+                        }
+                        else
+                        {
+                            Response response = new Response();
+                            response.Status = String.Empty;
+                            response.Remarks = "Medications item not found";
+                            return response;
+                        }
 
-                    if (medicineWeightInTotal < drone.Weight)
-                    {
-                        var result = context.Repositories.DispatchMedicineRepository.Create(dispatchMedicine);
-                        context.SaveChanges();
-                        return result;
+                        if (medicineWeightInTotal < drone.Weight)
+                        {
+
+                            var result = context.Repositories.DispatchMedicineRepository.Create(dispatchMedicine);
+                            context.SaveChanges();
+                            return result;
+                        }
+                        else
+                        {
+                            Response response = new Response();
+                            response.Status = String.Empty;
+                            response.Remarks = "Medications item weight cannot be greater than drone weight";
+                            return response;
+                        }
+
                     }
-                    else 
+                    else
                     {
                         Response response = new Response();
                         response.Status = String.Empty;
-                        response.Remarks = "Medicine weight cannot be greater than drone weight";
+                        var dispatchInformation = GetDispatchMedicationsInformationByDroneId(drone.Id);
+
+                        int statevalue = dispatchInformation.DroneState;
+                        var state = (DroneStateEnum)statevalue;
+                        string droneState = state.ToString();
+                        response.Remarks = "Operation Deny : Drone with Serial Number : " + drone.SerialNumber.ToString() + " is in state : " + droneState + "";
                         return response;
                     }
                 }
-
             }
         }
 
-        public double GetMedicineWeightInTotal(List<Medicine> medicines) 
+        /// <summary>
+        ///  Description : This method is for getting Dispatching medications item information by droneId
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <param name="droneId"></param>
+        /// <returns></returns>
+        public DispatchMedicine GetDispatchMedicationsInformationByDroneId(int droneId)
+        {
+            DispatchMedicine dispatchMedicine = new DispatchMedicine();
+            try
+            {
+                using (var context = _unitOfWork.Create())
+                {
+                    dispatchMedicine = context.Repositories.DispatchMedicineRepository.GetDispatchMedicationItemInformationByDroneId(droneId);
+                    return dispatchMedicine;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        ///  Description : This method is for checking provided drone is Idle or Not
+        /// </summary>
+        /// <param name="droneId"></param>
+        /// <returns></returns>
+        public bool IsProvidedDroneIsIdle(int droneId)
+        {
+            bool isIdle = false;
+            try
+            {
+                var medications = GetDispatchMedicationsInformationByDroneId(droneId);
+                if (medications != null || medications.Id > 0)
+                {
+                    switch (medications.DroneState)
+                    {
+
+                        case 1:          // 1: IDLE
+                            isIdle = true;
+                            break;
+                        case 2:          // 2: LOADING 
+                            isIdle = false;
+                            break;
+                        case 3:          // 3: LOADED 
+                            isIdle = false;
+                            break;
+                        case 4:          // 4: DELIVERING  
+                            isIdle = false;
+                            break;
+                        case 5:          // 5: DELIVERED  
+                            isIdle = false;
+                            break;
+                        case 6:          // 6: RETURNING  
+                            isIdle = false;
+                            break;
+                        default:
+                            isIdle = true;
+                            break;
+                    }
+
+                }
+                return isIdle;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        ///  Description : This method is responsible for returning total medications item weight
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <param name="medicines"></param>
+        /// <returns></returns>
+        public double GetMedicationsWeightInTotal(List<Medicine> medicines)
         {
             double weight = 0;
             try
             {
-                if (medicines.Count > 0) 
+                if (medicines.Count > 0)
                 {
-                    foreach (var item in medicines) 
+                    foreach (var item in medicines)
                     {
                         weight += item.Weight;
                     }
@@ -93,6 +194,26 @@ namespace Services.Drones
             {
 
                 throw;
+            }
+        }
+
+        /// <summary>
+        ///  Description : this method is for updating drone dispatch information 
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <param name="droneId"></param>
+        /// <param name="droneState"></param>
+        /// <param name="batteryPercentage"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Response UpdateDispatchInformation(string dispatchCode, int droneId, int droneState, double batteryPercentage)
+        {
+            using (var context = _unitOfWork.Create())
+            {
+                var result = context.Repositories.DispatchMedicineRepository.UpdateDispatchInformation(dispatchCode,droneId, droneState,batteryPercentage);
+                // Confirm changes
+                context.SaveChanges();
+                return result;
             }
         }
     }

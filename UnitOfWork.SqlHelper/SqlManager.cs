@@ -377,23 +377,46 @@ namespace UnitOfWork.SqlHelper
             }
         }
 
-        public void Update(string commandText, CommandType commandType, SqlParameter[] parameters)
+        //public void Update(string commandText, CommandType commandType, SqlParameter[] parameters)
+        //{
+        //    using (var connection = new SqlConnection(ConnectionString))
+        //    {
+        //        connection.Open();
+        //        using (var command = new SqlCommand(commandText, connection))
+        //        {
+        //            command.CommandType = commandType;
+        //            if (parameters != null)
+        //            {
+        //                foreach (var parameter in parameters)
+        //                {
+        //                    command.Parameters.Add(parameter);
+        //                }
+        //            }
+        //            command.ExecuteNonQuery();
+        //        }
+        //    }
+        //}
+
+        public string Update(SqlCommand cmd, SqlParameter[] parameters, out string msg)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            try
             {
-                connection.Open();
-                using (var command = new SqlCommand(commandText, connection))
+                string vMsg = string.Empty;
+                if (parameters != null)
                 {
-                    command.CommandType = commandType;
-                    if (parameters != null)
+                    foreach (var parameter in parameters)
                     {
-                        foreach (var parameter in parameters)
-                        {
-                            command.Parameters.Add(parameter);
-                        }
+                        cmd.Parameters.Add(parameter);
                     }
-                    command.ExecuteNonQuery();
                 }
+                cmd.CommandTimeout = 300;  // 5 Min
+                cmd.ExecuteNonQuery();
+                msg = Convert.ToString(cmd.Parameters["@Msg"].Value);
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 

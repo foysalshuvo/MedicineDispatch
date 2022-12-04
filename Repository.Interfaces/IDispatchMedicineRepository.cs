@@ -10,5 +10,8 @@ namespace Repository.Interfaces
     public interface IDispatchMedicineRepository
     {
         Response Create(DispatchMedicine droneRegistration);
+        DispatchMedicine GetDispatchMedicationItemInformationByDroneId(int droneId);
+
+        Response UpdateDispatchInformation(string dispatchCode,int droneId, int droneState, double batterPercentage);
     }
 }

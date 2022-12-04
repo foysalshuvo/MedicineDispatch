@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnitOfWork.SqlHelper;
@@ -21,6 +22,13 @@ namespace Repository.SqlServer
             this._transaction = transaction;
         }
 
+
+        /// <summary>
+        ///  Description : This method is responsible for save dispatching medications information 
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <param name="dispatchMedicine"></param>
+        /// <returns></returns>
         public Response Create(DispatchMedicine dispatchMedicine)
         {
             string _vMsg = string.Empty;
@@ -76,7 +84,7 @@ namespace Repository.SqlServer
 
                 if (response.Status == "000")
                 {
-                    if (dispatchMedicine.Medications.Count > 0) 
+                    if (dispatchMedicine.Medications.Count > 0)
                     {
                         foreach (Medicine medicine in dispatchMedicine.Medications)
                         {
@@ -84,7 +92,7 @@ namespace Repository.SqlServer
                             SaveDispatchMedicineInformation(medicine);
                         }
                     }
-                    
+
                 }
                 return response;
             }
@@ -94,6 +102,11 @@ namespace Repository.SqlServer
             }
         }
 
+        /// <summary>
+        ///  Description : This method is for Savings Medications item information 
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <param name="medicine"></param>
         public void SaveDispatchMedicineInformation(Medicine medicine)
         {
 
@@ -108,7 +121,7 @@ namespace Repository.SqlServer
             parameters.Add(dbManager.CreateParameter("@MedicineName", medicine.Name, DbType.String));
             parameters.Add(dbManager.CreateParameter("@MedicineWeight", medicine.Weight, DbType.Double));
             parameters.Add(dbManager.CreateParameter("@MedicineCode", medicine.Code, DbType.String));
-            parameters.Add(dbManager.CreateParameter("@MedicineImage", medicine.Image,DbType.Binary));
+            parameters.Add(dbManager.CreateParameter("@MedicineImage", medicine.Image, DbType.Binary));
 
             parameters.Add(dbManager.CreateParameter("@Msg", 500, null, DbType.String, ParameterDirection.Output));
             try
@@ -118,6 +131,171 @@ namespace Repository.SqlServer
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+
+        /// <summary>
+        ///  Description : This method is responsible for getting dispatch medications items by drone Id
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <param name="droneId"></param>
+        /// <returns></returns>
+        public DispatchMedicine GetDispatchMedicationItemInformationByDroneId(int droneId)
+        {
+            DispatchMedicine dispatchMedicine = new DispatchMedicine();
+            SqlManager dbManager = new SqlManager();
+            var command = CreateCommand("SP_DISPATCH_MEDICINE");
+            command.CommandType = CommandType.StoredProcedure;
+            command.CommandTimeout = 500;
+
+            // Store Procedure Parameter Assign 
+            var parameters = new List<SqlParameter>();
+            parameters.Add(dbManager.CreateParameter("@IntQuery", 3, DbType.Int32));
+            parameters.Add(dbManager.CreateParameter("@DroneId", droneId, DbType.Int16));
+            parameters.Add(dbManager.CreateParameter("@Msg", 500, null, DbType.String, ParameterDirection.Output));
+            var reader = dbManager.GetDataReader(command, parameters);
+
+            try
+            {
+                while (reader.Read())
+                {
+
+                    dispatchMedicine.Id = (Convert.IsDBNull(reader["Id"])) ? 0 : Convert.ToInt32(reader["Id"]);
+                    dispatchMedicine.DispatchCode = (Convert.IsDBNull(reader["DispatchCode"])) ? string.Empty : Convert.ToString(reader["DispatchCode"]);
+                    dispatchMedicine.DroneId = (Convert.IsDBNull(reader["DroneId"])) ? 0 : Convert.ToInt32(reader["DroneId"]);
+                    dispatchMedicine.DispatchDate = (Convert.IsDBNull(reader["DispatchDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["DispatchDate"]);
+                    dispatchMedicine.DeliveryFrom = (Convert.IsDBNull(reader["DeliveryFrom"])) ? string.Empty : Convert.ToString(reader["DeliveryFrom"]);
+                    dispatchMedicine.DeliveryTo = (Convert.IsDBNull(reader["DeliveryTo"])) ? string.Empty : Convert.ToString(reader["DeliveryTo"]);
+                    dispatchMedicine.DroneControlBy = (Convert.IsDBNull(reader["DroneControlBy"])) ? string.Empty : Convert.ToString(reader["DroneControlBy"]);
+
+                    // Drone State
+                    string _vDroneState = (Convert.IsDBNull(reader["DroneState"])) ? string.Empty : Convert.ToString(reader["DroneState"]);
+                    DroneStateEnum droneStateEnum = (DroneStateEnum)Enum.Parse(typeof(DroneStateEnum), _vDroneState);
+                    dispatchMedicine.DroneState = (Convert.IsDBNull(droneStateEnum) ? 0 : Convert.ToInt32(droneStateEnum));
+                    dispatchMedicine.BatterCapacity = (Convert.IsDBNull(reader["BatteryPercentage"])) ? 0 : Convert.ToDouble(reader["BatteryPercentage"]);
+
+                    dispatchMedicine.Medications = GetMedicationItemsListByDispatchCode(dispatchMedicine.DispatchCode);
+                }
+
+                return dispatchMedicine;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                reader.Close();
+            }
+        }
+
+        /// <summary>
+        ///  Description : This method is responsible for updating dispatching information along
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <param name="droneId"></param>
+        /// <param name="droneState"></param>
+        /// <param name="batteryPercentage"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public Response UpdateDispatchInformation(string dispatchCode, int droneId, int droneState, double batteryPercentage)
+        {
+            string _vMsg = string.Empty;
+            SqlManager dbManager = new SqlManager();
+            var command = CreateCommand("SP_DISPATCH_MEDICINE");
+            command.CommandType = CommandType.StoredProcedure;
+
+            // Store Procedure Parameter Assign 
+            var parameters = new List<SqlParameter>();
+            parameters.Add(dbManager.CreateParameter("@IntQuery", 5, DbType.Int32));
+            parameters.Add(dbManager.CreateParameter("@DispatchCode", droneId, DbType.String));
+            parameters.Add(dbManager.CreateParameter("@DroneId", droneId, DbType.String));
+            parameters.Add(dbManager.CreateParameter("@DroneState", droneState, DbType.String));
+            parameters.Add(dbManager.CreateParameter("@BatteryPercentage", batteryPercentage, DbType.Double));
+
+            parameters.Add(dbManager.CreateParameter("@Msg", 500, null, DbType.String, ParameterDirection.Output));
+
+            try
+            {
+                var result = dbManager.Update(command, parameters.ToArray(), out _vMsg);
+                //------------------- Parsing from return String ---------------------------/
+
+                string[] _firstSplit = result.Split(" || ");
+                string[] _secondSplit;
+                Response response = new Response();
+                foreach (string item in _firstSplit)
+                {
+                    _secondSplit = item.Split(":");
+                    if (_secondSplit[0].Trim() == "Status")
+                    {
+                        response.Status = _secondSplit[1].Trim();
+                    }
+                    if (_secondSplit[0].Trim() == "Remarks")
+                    {
+                        response.Reference = _secondSplit[1].Trim();
+                    }
+                }
+                //---------------------------------------------------------------------------/
+
+                return response; // Resutl will be return 
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+        /// <summary>
+        ///  Description : This method is responsible for getting medication items list by Dispatch Code
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <param name="dispatchCode"></param>
+        /// <returns></returns>
+        public List<Medicine> GetMedicationItemsListByDispatchCode(string dispatchCode)
+        {
+            List<Medicine> medicines = new List<Medicine>();
+            Medicine medicine;
+
+            SqlManager dbManager = new SqlManager();
+            var command = CreateCommand("SP_DISPATCH_MEDICINE");
+            command.CommandType = CommandType.StoredProcedure;
+
+
+            // Store Procedure Parameter Assign 
+            var parameters = new List<SqlParameter>();
+            parameters.Add(dbManager.CreateParameter("@IntQuery", 4, DbType.Int32));
+            parameters.Add(dbManager.CreateParameter("@DispatchCode", dispatchCode, DbType.String));
+            parameters.Add(dbManager.CreateParameter("@Msg", 500, null, DbType.String, ParameterDirection.Output));
+            var rdr = dbManager.GetDataReader(command, parameters);
+
+            try
+            {
+                while (rdr.Read())
+                {
+                    medicine = new Medicine();
+                    medicine.Id = (Convert.IsDBNull(rdr["Id"])) ? 0 : Convert.ToInt32(rdr["Id"]);
+                    medicine.DispatchCode = (Convert.IsDBNull(rdr["DispatchCode"])) ? string.Empty : Convert.ToString(rdr["DispatchCode"]);
+                    medicine.Name = (Convert.IsDBNull(rdr["MedicineName"])) ? string.Empty : Convert.ToString(rdr["MedicineName"]);
+                    medicine.Weight = (Convert.IsDBNull(rdr["MedicineWeight"])) ? 0 : Convert.ToDouble(rdr["MedicineWeight"]);
+                    medicine.Code = (Convert.IsDBNull(rdr["MedicineCode"])) ? string.Empty : Convert.ToString(rdr["MedicineCode"]);
+
+                    byte[] imagefileStream = new byte[0];
+                    medicine.Image = (Convert.IsDBNull(rdr["MedicineImage"])) ? imagefileStream : Encoding.ASCII.GetBytes(Convert.ToString(rdr["MedicineImage"]));
+
+                    medicines.Add(medicine);
+                }
+
+                return medicines;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                rdr.Close();
             }
         }
 

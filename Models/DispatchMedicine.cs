@@ -10,6 +10,7 @@ namespace Models
     public class DispatchMedicine
     {
         public int Id { get; set; }
+        public string? DispatchCode { get; set; }
 
         [Required]
         public int DroneId { get; set; }

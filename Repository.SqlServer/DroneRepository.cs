@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,11 +38,7 @@ namespace Repository.SqlServer
             string droneModel = model.ToString();
 
 
-            // State
-            int statevalue = drone.DroneState;
-            var state = (DroneStateEnum)statevalue;
-            string droneState = state.ToString();
-
+            
 
             // Store Procedure Parameter Assign 
             var parameters = new List<SqlParameter>();
@@ -49,8 +46,6 @@ namespace Repository.SqlServer
             parameters.Add(dbManager.CreateParameter("@SerialNumber", Convert.ToString(drone.SerialNumber), DbType.String));
             parameters.Add(dbManager.CreateParameter("@Model", droneModel, DbType.String));
             parameters.Add(dbManager.CreateParameter("@Weight", drone.Weight, DbType.Double));
-            parameters.Add(dbManager.CreateParameter("@BatteryCapacity", drone.BatterCapacity, DbType.Double));
-            parameters.Add(dbManager.CreateParameter("@State", droneState, DbType.String));
             parameters.Add(dbManager.CreateParameter("@msg", 500, null, DbType.String, ParameterDirection.Output));
 
             try
@@ -82,5 +77,94 @@ namespace Repository.SqlServer
             }
         }
 
+        public IEnumerable<Drone> GetAll()
+        {
+            List<Drone> drones = new List<Drone>();
+            Drone drone;
+            SqlManager dbManager = new SqlManager();
+            var command = CreateCommand("SP_DRONE");
+            command.CommandType = CommandType.StoredProcedure;
+
+
+            // Store Procedure Parameter Assign 
+            var parameters = new List<SqlParameter>();
+            parameters.Add(dbManager.CreateParameter("@IntQuery", 4, DbType.String));
+            parameters.Add(dbManager.CreateParameter("@msg", 500, null, DbType.String, ParameterDirection.Output));
+            var reader = dbManager.GetDataReader(command, parameters);
+
+            try
+            {
+                while (reader.Read())
+                {
+                    drone = new Drone();
+                    drone.Id = (Convert.IsDBNull(reader["Id"])) ? 0 : Convert.ToInt32(reader["Id"]);
+                    drone.SerialNumber = (Convert.IsDBNull(reader["SerialNumber"])) ? string.Empty : Convert.ToString(reader["SerialNumber"]);
+
+                    // Model 
+                    string _vModel = (Convert.IsDBNull(reader["Model"])) ? string.Empty : Convert.ToString(reader["Model"]);
+                    DroneModelEnum droneModelEnum = (DroneModelEnum)Enum.Parse(typeof(DroneModelEnum), _vModel);
+                    drone.Model = (Convert.IsDBNull(droneModelEnum) ? 0 : Convert.ToInt32(droneModelEnum));
+
+                    drone.Weight = (Convert.IsDBNull(reader["Weight"])) ? 0 : Convert.ToDouble(reader["Weight"]);
+                 
+                    drone.RegistrationDate = (Convert.IsDBNull(reader["RegistrationDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["RegistrationDate"]);
+                    drone.SyncDate = (Convert.IsDBNull(reader["SyncDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["SyncDate"]);
+                    drones.Add(drone);
+                }
+
+                return drones;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                reader.Close();
+            }
+        }
+
+        public Drone GetDroneInformationByDroneId(int droneId)
+        {
+            Drone drone = new Drone();
+            SqlManager dbManager = new SqlManager();
+            var command = CreateCommand("SP_DRONE");
+            command.CommandType = CommandType.StoredProcedure;
+
+
+            // Store Procedure Parameter Assign 
+            var parameters = new List<SqlParameter>();
+            parameters.Add(dbManager.CreateParameter("@IntQuery", 2, DbType.String));
+            parameters.Add(dbManager.CreateParameter("@Id", droneId, DbType.Int32));
+            parameters.Add(dbManager.CreateParameter("@msg", 500, null, DbType.String, ParameterDirection.Output));
+            var reader = dbManager.GetDataReader(command, parameters);
+
+            try
+            {
+                while (reader.Read())
+                {
+                    drone.Id = (Convert.IsDBNull(reader["Id"])) ? 0 : Convert.ToInt32(reader["Id"]);
+                    drone.SerialNumber = (Convert.IsDBNull(reader["SerialNumber"])) ? string.Empty : Convert.ToString(reader["SerialNumber"]);
+
+                    string _vModel = (Convert.IsDBNull(reader["Model"])) ? string.Empty : Convert.ToString(reader["Model"]);
+                    DroneModelEnum droneModelEnum = (DroneModelEnum)Enum.Parse(typeof(DroneModelEnum), _vModel);
+                    drone.Model = (Convert.IsDBNull(droneModelEnum) ? 0 : Convert.ToInt32(droneModelEnum));
+
+                    drone.Weight = (Convert.IsDBNull(reader["Weight"])) ? 0 : Convert.ToDouble(reader["Weight"]);
+                    drone.RegistrationDate = (Convert.IsDBNull(reader["RegistrationDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["RegistrationDate"]);
+                    drone.SyncDate = (Convert.IsDBNull(reader["SyncDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["SyncDate"]);
+                }
+
+                return drone;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                reader.Close();
+            }
+        }
     }
 }

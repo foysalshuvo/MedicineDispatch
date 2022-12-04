@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnitOfWork.SqlHelper;
+using static CommonEnum.CommonEnum;
 
 namespace Repository.SqlServer
 {
@@ -26,6 +27,13 @@ namespace Repository.SqlServer
             Response response;
             SqlManager dbManager = new SqlManager();
 
+            // State
+            int statevalue = dispatchMedicine.DroneState;
+            var state = (DroneStateEnum)statevalue;
+            string droneState = state.ToString();
+
+
+
             var command = CreateCommand("SP_DISPATCH_MEDICINE");
             command.CommandType = CommandType.StoredProcedure;
 
@@ -37,9 +45,10 @@ namespace Repository.SqlServer
             parameters.Add(dbManager.CreateParameter("@DeliveryFrom", dispatchMedicine.DeliveryFrom, DbType.String));
             parameters.Add(dbManager.CreateParameter("@DeliveryTo", dispatchMedicine.DeliveryTo, DbType.String));
             parameters.Add(dbManager.CreateParameter("@DroneControlBy", dispatchMedicine.DroneControlBy, DbType.String));
-            parameters.Add(dbManager.CreateParameter("@DispatchStatus", dispatchMedicine.DispatchStatus, DbType.String));
+            parameters.Add(dbManager.CreateParameter("@BatteryPercentage", dispatchMedicine.BatterCapacity, DbType.Double));
+            parameters.Add(dbManager.CreateParameter("@DroneState", droneState, DbType.String));
+
             parameters.Add(dbManager.CreateParameter("@Msg", 500, null, DbType.String, ParameterDirection.Output));
-            parameters.Add(dbManager.CreateParameter("@DispatchID", 20, null, DbType.Int32, ParameterDirection.Output));
             try
             {
                 var result = dbManager.Insert(command, parameters.ToArray(), out _vMsg);
@@ -99,7 +108,8 @@ namespace Repository.SqlServer
             parameters.Add(dbManager.CreateParameter("@MedicineName", medicine.Name, DbType.String));
             parameters.Add(dbManager.CreateParameter("@MedicineWeight", medicine.Weight, DbType.Double));
             parameters.Add(dbManager.CreateParameter("@MedicineCode", medicine.Code, DbType.String));
-            parameters.Add(dbManager.CreateParameter("@MedicineImage", medicine.Image, DbType.Byte));
+            parameters.Add(dbManager.CreateParameter("@MedicineImage", medicine.Image,DbType.Binary));
+
             parameters.Add(dbManager.CreateParameter("@Msg", 500, null, DbType.String, ParameterDirection.Output));
             try
             {

@@ -12,6 +12,9 @@ namespace Services.Drones
     public interface IDroneService
     {
         Response Create(Drone drone);
+        IEnumerable<Drone> GetAll();
+        Drone GetDroneInformationByDroneId(int id);
+
     }
     public class DroneService: IDroneService
     {
@@ -31,5 +34,38 @@ namespace Services.Drones
                 return result;
             }
         }
+
+        public IEnumerable<Drone> GetAll()
+        {
+            try
+            {
+                using (var context = _unitOfWork.Create())
+                {
+                    var result = context.Repositories.DronesRepository.GetAll();
+                    return result;
+                }
+            }
+            catch (Exception ex) 
+            {
+                throw ex;
+            }
+        }
+
+        public Drone GetDroneInformationByDroneId(int droneId) 
+        {
+            try
+            {
+                using (var context = _unitOfWork.Create())
+                {
+                    var result = context.Repositories.DronesRepository.GetDroneInformationByDroneId(droneId);
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
     }
 }

@@ -17,7 +17,15 @@ namespace Models
         public string? DeliveryFrom { get; set; }
         public string? DeliveryTo { get; set; }
         public string? DroneControlBy { get; set; }
-        public string? DispatchStatus { get; set; }
+     
+        [Required]
+        [Range(1, 100, ErrorMessage = "Drone battery capacity be range between 1 to 100 percentage")]
+        public double BatterCapacity { get; set; }
+
+        [Required]
+        [Range(1, 6, ErrorMessage = "Drone state value must be between 1 to 6")]
+        public int DroneState { get; set; }
+
         public List<Medicine>? Medications { set; get; }
 
     }

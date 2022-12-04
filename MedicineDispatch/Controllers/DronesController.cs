@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.Drones;
+using System.Data.SqlTypes;
 using System.Net;
 using System.Text.Json;
 
@@ -29,43 +30,82 @@ namespace MedicineDispatch.Controllers
         }
 
 
-        [HttpPost("Add")]
-        public ApiResponse Add([FromBody] Drone drone)
+        [HttpPost("AddDrone")]
+        public ApiResponse AddDrone([FromBody] Drone drone)
         {
             try
             {
-                if (drone == null) 
+                if (drone == null)
                 {
                     return new ApiResponse(Convert.ToInt16(HttpStatusCode.BadRequest));
                 }
 
                 if (ModelState.IsValid)
-                { 
+                {
                     var _vResult = _iDroneService.Create(drone);
                     var _vJSONResult = JsonSerializer.Serialize(_vResult);
                     string _vCombindedString = string.Join(",", _vResult);
                     _logger.LogInformation("Response msg: " + _vCombindedString);
-                    return new ApiResponse("Request Successful", _vResult, 200, "1.0.0.0");
+                    return new ApiResponse("Request Successful", _vResult, Convert.ToInt16(HttpStatusCode.OK), "1.0.0.0");
                 }
                 else
                 {
                     var _errorMessage = string.Join(" | ", ModelState.Values
                                 .SelectMany(v => v.Errors)
                                 .Select(e => e.ErrorMessage));
-                  
-                    _logger.LogError(""+ _errorMessage + "");
+
+                    _logger.LogError("" + _errorMessage + "");
                     return new ApiResponse(Convert.ToInt16(HttpStatusCode.BadRequest), _errorMessage);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new ApiResponse(Convert.ToInt16(HttpStatusCode.BadRequest),ex.Message);
+                return new ApiResponse(Convert.ToInt16(HttpStatusCode.BadRequest), ex.Message);
             }
         }
 
-        [HttpPost("Dispatch")]
-        public ApiResponse Dispatch([FromBody] DispatchMedicine dispatchMedicine)
+        [HttpGet("GetAllDrones")]
+        public ApiResponse GetAllDrones()
+        {
+            try
+            {
+                var _vResult = _iDroneService.GetAll();
+                var _vJSONResult = JsonSerializer.Serialize(_vResult);
+                _logger.LogInformation("Response msg: " + _vJSONResult);
+                return new ApiResponse("Request Successful", _vResult, Convert.ToInt16(HttpStatusCode.OK), "1.0.0.0");
+
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(ex.Message);
+            }
+
+        }
+
+
+        [HttpGet("GetDroneInformationByDroneId")]
+        public ApiResponse GetDroneInformationByDroneId(int droneId)
+        {
+            try
+            {
+                var _vResult = _iDroneService.GetDroneInformationByDroneId(droneId);
+                var _vJSONResult = JsonSerializer.Serialize(_vResult);
+                _logger.LogInformation("Response msg: " + _vJSONResult);
+                return new ApiResponse("Request Successful", _vResult, Convert.ToInt16(HttpStatusCode.OK), "1.0.0.0");
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return new ApiResponse(Convert.ToInt16(HttpStatusCode.BadRequest), ex.Message);
+            }
+
+        }
+
+
+        [HttpPost("DispatchMedicine")]
+        public ApiResponse DispatchMedicine([FromBody] DispatchMedicine dispatchMedicine)
         {
             try
             {
@@ -76,7 +116,7 @@ namespace MedicineDispatch.Controllers
                     var _vJSONResult = JsonSerializer.Serialize(_vResult);
                     string _vCombindedString = string.Join(",", _vResult);
                     _logger.LogInformation("Response msg: " + _vCombindedString);
-                    return new ApiResponse("Request Successful", _vResult, 200, "1.0.0.0");
+                    return new ApiResponse("Request Successful", _vResult, Convert.ToInt16(HttpStatusCode.OK), "1.0.0.0");
                 }
                 else
                 {
@@ -94,6 +134,37 @@ namespace MedicineDispatch.Controllers
                 return new ApiResponse(ex.Message);
             }
         }
+
+        //[HttpGet("GetMedicineInformationsByDrone")]
+        //public ApiResponse GetMedicineInformationsByDrone(int droneId)
+        //{
+        //    try
+        //    {
+
+        //        if (ModelState.IsValid)
+        //        {
+        //            var _vResult = _iDispatchMedicineService.DispatchMedicine(dispatchMedicine);
+        //            var _vJSONResult = JsonSerializer.Serialize(_vResult);
+        //            string _vCombindedString = string.Join(",", _vResult);
+        //            _logger.LogInformation("Response msg: " + _vCombindedString);
+        //            return new ApiResponse("Request Successful", _vResult, 200, "1.0.0.0");
+        //        }
+        //        else
+        //        {
+        //            var _errorMessage = string.Join(" | ", ModelState.Values
+        //                        .SelectMany(v => v.Errors)
+        //                        .Select(e => e.ErrorMessage));
+
+        //            _logger.LogError("" + _errorMessage + "");
+        //            return new ApiResponse(Convert.ToInt16(HttpStatusCode.BadRequest), _errorMessage);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex.ToString());
+        //        return new ApiResponse(ex.Message);
+        //    }
+        //}
 
     }
 }

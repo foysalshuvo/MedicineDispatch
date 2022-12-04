@@ -10,5 +10,7 @@ namespace Repository.Interfaces
     public interface IDroneRepository
     {
         Response Create(Drone drone);
+        IEnumerable<Drone> GetAll();
+        Drone GetDroneInformationByDroneId(int droneId);
     }
 }

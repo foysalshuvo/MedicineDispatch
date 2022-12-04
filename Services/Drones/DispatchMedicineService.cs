@@ -1,6 +1,7 @@
 ﻿using Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -15,6 +16,8 @@ namespace Services.Drones
     {
         Response DispatchMedicine(DispatchMedicine droneRegistration);
         Response UpdateDispatchInformation(string dispatchCode, int droneId, int droneState, double batteryPercentage);
+        IEnumerable<Drone> GetAllAvailableDronesForLoading();
+
     }
 
     public class DispatchMedicineService : IDispatchMedicineService
@@ -153,7 +156,7 @@ namespace Services.Drones
                             isIdle = false;
                             break;
                         case 6:          // 6: RETURNING  
-                            isIdle = false;
+                            isIdle = true;
                             break;
                         default:
                             isIdle = true;
@@ -210,11 +213,101 @@ namespace Services.Drones
         {
             using (var context = _unitOfWork.Create())
             {
-                var result = context.Repositories.DispatchMedicineRepository.UpdateDispatchInformation(dispatchCode,droneId, droneState,batteryPercentage);
-                // Confirm changes
-                context.SaveChanges();
-                return result;
+
+                // Prevent Loding State if battery level below 25%
+                var dispatchInformation = context.Repositories.DispatchMedicineRepository.GetDispatchMedicationItemInformationByDroneId(droneId);
+                if (dispatchInformation != null || dispatchInformation.Id != 0)
+                {
+                    bool isLoadingState = false;
+                    switch (droneState)
+                    {
+                        case 2:          // 2:LOADING 
+                            isLoadingState = true;
+                            break;
+                        default:
+                            isLoadingState = false;
+                            break;
+                    }
+
+                    if (dispatchInformation.BatterCapacity < 25 && isLoadingState == true)
+                    {
+
+                        Response response = new Response();
+                        response.Status = String.Empty;
+
+                        int statevalue = dispatchInformation.DroneState;
+                        var _state = (DroneStateEnum)statevalue;
+                        string _droneState = _state.ToString();
+                        response.Remarks = "Drone battery percentage is below 25% and LOADING is not permitable";
+                        return response;
+                    }
+                    else
+                    {
+
+                        // Enum=>String (Drone State)
+                        var state = (DroneStateEnum)droneState;
+                        string strdroneState = state.ToString();
+
+                        var result = context.Repositories.DispatchMedicineRepository.UpdateDispatchInformation(dispatchCode, droneId, strdroneState, batteryPercentage);
+                        // Confirm changes
+                        context.SaveChanges();
+                        return result;
+                    }
+                }
+                else
+                {
+
+                    Response response = new Response();
+                    response.Status = Convert.ToString(HttpStatusCode.BadRequest);
+                    response.Remarks = "Dispatch medication information not found";
+                    return response;
+                }
+
             }
         }
+
+
+        /// <summary>
+        ///  Description : This method is for getting available drones for loading purpose
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Drone> GetAllAvailableDronesForLoading()
+        {
+            List<Drone> drones = new List<Drone>();
+            Drone drone;
+            try
+            {
+                using (var context = _unitOfWork.Create())
+                {
+                    var availableItemForLoading = context.Repositories.DispatchMedicineRepository.GetAllAvailableDronesForLoading();
+
+                    if (availableItemForLoading != null)
+                    {
+                        foreach (var item in availableItemForLoading)
+                        {
+                            drone = new Drone();
+                            drone = context.Repositories.DronesRepository.GetDroneInformationByDroneId(item.DroneId);
+
+                            int statevalue = item.DroneState;
+                            var state = (DroneStateEnum)statevalue;
+                            string droneState = state.ToString();
+                            drone.DroneState = droneState;
+                            drone.DroneBatteryPercentage = item.BatterCapacity;
+
+                            drones.Add(drone);
+                        }
+                    }
+
+                    return drones;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
     }
 }

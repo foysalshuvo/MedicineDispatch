@@ -28,6 +28,7 @@ namespace Models
         public double Weight { get; set; }
 
         public DateTime RegistrationDate { get; set; }
-        public DateTime SyncDate { get; set; }
+        public string? DroneState { get; set; }
+        public double DroneBatteryPercentage { get; set; }
     }
 }

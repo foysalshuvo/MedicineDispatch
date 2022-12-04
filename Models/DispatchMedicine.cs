@@ -14,7 +14,9 @@ namespace Models
 
         [Required]
         public int DroneId { get; set; }
-        public DateTime DispatchDate { get; set; }
+        public DateTime DispatchStartDate { get; set; }
+        public DateTime DispatchComplateDate { get; set; }
+
         public string? DeliveryFrom { get; set; }
         public string? DeliveryTo { get; set; }
         public string? DroneControlBy { get; set; }
@@ -24,7 +26,7 @@ namespace Models
         public double BatterCapacity { get; set; }
 
         [Required]
-        [Range(1, 6, ErrorMessage = "Drone state value must be between 1 to 6")]
+        [Range(1,6, ErrorMessage = "Drone state value must be betwen 1 to 6")]
         public int DroneState { get; set; }
 
         public List<Medicine>? Medications { set; get; }

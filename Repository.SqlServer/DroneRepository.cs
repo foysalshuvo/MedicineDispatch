@@ -22,6 +22,12 @@ namespace Repository.SqlServer
             this._transaction = transaction;
         }
 
+        /// <summary>
+        ///  Description : This method is for register drone
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <param name="drone"></param>
+        /// <returns></returns>
         public Response Create(Drone drone)
         {
             string _vMsg = string.Empty;
@@ -77,6 +83,12 @@ namespace Repository.SqlServer
             }
         }
 
+
+        /// <summary>
+        ///  Description : This method is for Getting All drones information list
+        ///  Author      : Foysal Alam
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<Drone> GetAll()
         {
             List<Drone> drones = new List<Drone>();
@@ -108,7 +120,6 @@ namespace Repository.SqlServer
                     drone.Weight = (Convert.IsDBNull(reader["Weight"])) ? 0 : Convert.ToDouble(reader["Weight"]);
                  
                     drone.RegistrationDate = (Convert.IsDBNull(reader["RegistrationDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["RegistrationDate"]);
-                    drone.SyncDate = (Convert.IsDBNull(reader["SyncDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["SyncDate"]);
                     drones.Add(drone);
                 }
 
@@ -124,6 +135,12 @@ namespace Repository.SqlServer
             }
         }
 
+        /// <summary>
+        /// Description : This method is for getting drone information by drone Id
+        /// Author      : Foysal Alam
+        /// </summary>
+        /// <param name="droneId"></param>
+        /// <returns></returns>
         public Drone GetDroneInformationByDroneId(int droneId)
         {
             Drone drone = new Drone();
@@ -152,7 +169,7 @@ namespace Repository.SqlServer
 
                     drone.Weight = (Convert.IsDBNull(reader["Weight"])) ? 0 : Convert.ToDouble(reader["Weight"]);
                     drone.RegistrationDate = (Convert.IsDBNull(reader["RegistrationDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["RegistrationDate"]);
-                    drone.SyncDate = (Convert.IsDBNull(reader["SyncDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["SyncDate"]);
+                  
                 }
 
                 return drone;

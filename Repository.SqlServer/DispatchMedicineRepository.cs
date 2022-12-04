@@ -49,7 +49,7 @@ namespace Repository.SqlServer
             var parameters = new List<SqlParameter>();
             parameters.Add(dbManager.CreateParameter("@IntQuery", 1, DbType.Int16));
             parameters.Add(dbManager.CreateParameter("@DroneId", dispatchMedicine.DroneId, DbType.Int32));
-            parameters.Add(dbManager.CreateParameter("@DispatchDate", dispatchMedicine.DispatchDate, DbType.DateTime));
+            parameters.Add(dbManager.CreateParameter("@DispatchStartDate", dispatchMedicine.DispatchStartDate, DbType.DateTime));
             parameters.Add(dbManager.CreateParameter("@DeliveryFrom", dispatchMedicine.DeliveryFrom, DbType.String));
             parameters.Add(dbManager.CreateParameter("@DeliveryTo", dispatchMedicine.DeliveryTo, DbType.String));
             parameters.Add(dbManager.CreateParameter("@DroneControlBy", dispatchMedicine.DroneControlBy, DbType.String));
@@ -118,6 +118,7 @@ namespace Repository.SqlServer
             List<SqlParameter> parameters = new List<SqlParameter>();
             parameters.Add(dbManager.CreateParameter("@IntQuery", 2, DbType.Int16));
             parameters.Add(dbManager.CreateParameter("@DispatchCode", medicine.DispatchCode, DbType.String));
+            parameters.Add(dbManager.CreateParameter("@DroneId", medicine.DroneId, DbType.Int32));
             parameters.Add(dbManager.CreateParameter("@MedicineName", medicine.Name, DbType.String));
             parameters.Add(dbManager.CreateParameter("@MedicineWeight", medicine.Weight, DbType.Double));
             parameters.Add(dbManager.CreateParameter("@MedicineCode", medicine.Code, DbType.String));
@@ -133,7 +134,6 @@ namespace Repository.SqlServer
                 throw ex;
             }
         }
-
 
         /// <summary>
         ///  Description : This method is responsible for getting dispatch medications items by drone Id
@@ -164,7 +164,9 @@ namespace Repository.SqlServer
                     dispatchMedicine.Id = (Convert.IsDBNull(reader["Id"])) ? 0 : Convert.ToInt32(reader["Id"]);
                     dispatchMedicine.DispatchCode = (Convert.IsDBNull(reader["DispatchCode"])) ? string.Empty : Convert.ToString(reader["DispatchCode"]);
                     dispatchMedicine.DroneId = (Convert.IsDBNull(reader["DroneId"])) ? 0 : Convert.ToInt32(reader["DroneId"]);
-                    dispatchMedicine.DispatchDate = (Convert.IsDBNull(reader["DispatchDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["DispatchDate"]);
+                    dispatchMedicine.DispatchStartDate = (Convert.IsDBNull(reader["DispatchStartDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["DispatchStartDate"]);
+                    dispatchMedicine.DispatchComplateDate = (Convert.IsDBNull(reader["DispatchCompleteDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["DispatchCompleteDate"]);
+
                     dispatchMedicine.DeliveryFrom = (Convert.IsDBNull(reader["DeliveryFrom"])) ? string.Empty : Convert.ToString(reader["DeliveryFrom"]);
                     dispatchMedicine.DeliveryTo = (Convert.IsDBNull(reader["DeliveryTo"])) ? string.Empty : Convert.ToString(reader["DeliveryTo"]);
                     dispatchMedicine.DroneControlBy = (Convert.IsDBNull(reader["DroneControlBy"])) ? string.Empty : Convert.ToString(reader["DroneControlBy"]);
@@ -199,7 +201,7 @@ namespace Repository.SqlServer
         /// <param name="batteryPercentage"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Response UpdateDispatchInformation(string dispatchCode, int droneId, int droneState, double batteryPercentage)
+        public Response UpdateDispatchInformation(string dispatchCode, int droneId, string droneState, double batteryPercentage)
         {
             string _vMsg = string.Empty;
             SqlManager dbManager = new SqlManager();
@@ -209,7 +211,7 @@ namespace Repository.SqlServer
             // Store Procedure Parameter Assign 
             var parameters = new List<SqlParameter>();
             parameters.Add(dbManager.CreateParameter("@IntQuery", 5, DbType.Int32));
-            parameters.Add(dbManager.CreateParameter("@DispatchCode", droneId, DbType.String));
+            parameters.Add(dbManager.CreateParameter("@DispatchCode", dispatchCode, DbType.String));
             parameters.Add(dbManager.CreateParameter("@DroneId", droneId, DbType.String));
             parameters.Add(dbManager.CreateParameter("@DroneState", droneState, DbType.String));
             parameters.Add(dbManager.CreateParameter("@BatteryPercentage", batteryPercentage, DbType.Double));
@@ -233,7 +235,7 @@ namespace Repository.SqlServer
                     }
                     if (_secondSplit[0].Trim() == "Remarks")
                     {
-                        response.Reference = _secondSplit[1].Trim();
+                        response.Remarks = _secondSplit[1].Trim();
                     }
                 }
                 //---------------------------------------------------------------------------/
@@ -245,7 +247,6 @@ namespace Repository.SqlServer
                 throw ex;
             }
         }
-
 
         /// <summary>
         ///  Description : This method is responsible for getting medication items list by Dispatch Code
@@ -296,6 +297,67 @@ namespace Repository.SqlServer
             finally
             {
                 rdr.Close();
+            }
+        }
+
+        /// <summary>
+        /// Description : This method is responsible for fetching all available drones for LOADING state
+        /// Autrho      : Foysal Alam
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<DispatchMedicine> GetAllAvailableDronesForLoading() 
+        {
+            List<DispatchMedicine> dispatchMedicines = new List<DispatchMedicine>();
+            DispatchMedicine dispatchMedicine;
+
+            SqlManager dbManager = new SqlManager();
+            var command = CreateCommand("SP_DISPATCH_MEDICINE");
+            command.CommandType = CommandType.StoredProcedure;
+
+
+            // Store Procedure Parameter Assign 
+            var parameters = new List<SqlParameter>();
+            parameters.Add(dbManager.CreateParameter("@IntQuery", 6, DbType.Int32));
+            parameters.Add(dbManager.CreateParameter("@DroneState", "IDLE", DbType.String));
+            parameters.Add(dbManager.CreateParameter("@Msg", 500, null, DbType.String, ParameterDirection.Output));
+            var reader = dbManager.GetDataReader(command, parameters);
+
+            try
+            {
+                while (reader.Read())
+                {
+                    dispatchMedicine = new DispatchMedicine();
+                    dispatchMedicine.Id = (Convert.IsDBNull(reader["Id"])) ? 0 : Convert.ToInt32(reader["Id"]);
+                    dispatchMedicine.DispatchCode = (Convert.IsDBNull(reader["DispatchCode"])) ? string.Empty : Convert.ToString(reader["DispatchCode"]);
+                    dispatchMedicine.DroneId = (Convert.IsDBNull(reader["DroneId"])) ? 0 : Convert.ToInt32(reader["DroneId"]);
+                    dispatchMedicine.DispatchStartDate = (Convert.IsDBNull(reader["DispatchStartDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["DispatchStartDate"]);
+                    dispatchMedicine.DispatchComplateDate = (Convert.IsDBNull(reader["DispatchCompleteDate"])) ? DateTime.MinValue : Convert.ToDateTime(reader["DispatchCompleteDate"]);
+
+                    dispatchMedicine.DeliveryFrom = (Convert.IsDBNull(reader["DeliveryFrom"])) ? string.Empty : Convert.ToString(reader["DeliveryFrom"]);
+                    dispatchMedicine.DeliveryTo = (Convert.IsDBNull(reader["DeliveryTo"])) ? string.Empty : Convert.ToString(reader["DeliveryTo"]);
+                    dispatchMedicine.DroneControlBy = (Convert.IsDBNull(reader["DroneControlBy"])) ? string.Empty : Convert.ToString(reader["DroneControlBy"]);
+
+                    // Drone State
+                    string _vDroneState = (Convert.IsDBNull(reader["DroneState"])) ? string.Empty : Convert.ToString(reader["DroneState"]);
+                    DroneStateEnum droneStateEnum = (DroneStateEnum)Enum.Parse(typeof(DroneStateEnum), _vDroneState);
+                    dispatchMedicine.DroneState = (Convert.IsDBNull(droneStateEnum) ? 0 : Convert.ToInt32(droneStateEnum));
+                    dispatchMedicine.BatterCapacity = (Convert.IsDBNull(reader["BatteryPercentage"])) ? 0 : Convert.ToDouble(reader["BatteryPercentage"]);
+
+                    dispatchMedicine.Medications = GetMedicationItemsListByDispatchCode(dispatchMedicine.DispatchCode);
+
+
+                    dispatchMedicines.Add(dispatchMedicine);
+                }
+
+                return dispatchMedicines;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                reader.Close();
             }
         }
 

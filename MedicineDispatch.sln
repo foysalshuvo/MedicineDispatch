@@ -38,7 +38,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MedicineDispatch.DBScipt", "MedicineDispatch.DBScipt", "{02779FAF-AE4D-404D-8698-0CB41A2CFF57}"
 	ProjectSection(SolutionItems) = preProject
 		GeneratedSchemaScirpt.txt = GeneratedSchemaScirpt.txt
-		GeneratedSchemaWithDataScript.txt = GeneratedSchemaWithDataScript.txt
+		SampleDataInsertScript.txt = SampleDataInsertScript.txt
 	EndProjectSection
 EndProject
 Global

@@ -1,0 +1,36 @@
+-- Sample Drone Information Insert Script
+
+INSERT [dbo].[Drones] ([Id], [SerialNumber], [Model], [Weight], [RegistrationDate]) VALUES (1, N'SL01', N'LIGHTWEIGHT', 500, CAST(N'2022-12-04T16:05:54.703' AS DateTime))
+INSERT [dbo].[Drones] ([Id], [SerialNumber], [Model], [Weight], [RegistrationDate]) VALUES (2, N'SL02', N'MIDDLEWEIGHT', 500, CAST(N'2022-12-04T16:06:12.890' AS DateTime))
+INSERT [dbo].[Drones] ([Id], [SerialNumber], [Model], [Weight], [RegistrationDate]) VALUES (3, N'SL03', N'CRUISERWEIGHT', 500, CAST(N'2022-12-04T16:06:23.413' AS DateTime))
+INSERT [dbo].[Drones] ([Id], [SerialNumber], [Model], [Weight], [RegistrationDate]) VALUES (4, N'SL04', N'HEAVYWEIGHT', 500, CAST(N'2022-12-04T16:06:29.443' AS DateTime))
+INSERT [dbo].[Drones] ([Id], [SerialNumber], [Model], [Weight], [RegistrationDate]) VALUES (5, N'SL05', N'CRUISERWEIGHT', 360, CAST(N'2022-12-05T01:23:04.157' AS DateTime))
+INSERT [dbo].[Drones] ([Id], [SerialNumber], [Model], [Weight], [RegistrationDate]) VALUES (6, N'SL06', N'MIDDLEWEIGHT', 400, CAST(N'2022-12-04T16:06:12.890' AS DateTime))
+INSERT [dbo].[Drones] ([Id], [SerialNumber], [Model], [Weight], [RegistrationDate]) VALUES (7, N'SL07', N'MIDDLEWEIGHT', 330, CAST(N'2022-12-04T16:06:12.890' AS DateTime))
+INSERT [dbo].[Drones] ([Id], [SerialNumber], [Model], [Weight], [RegistrationDate]) VALUES (8, N'SL08', N'LIGHTWEIGHT', 200, CAST(N'2022-12-04T16:06:12.890' AS DateTime))
+INSERT [dbo].[Drones] ([Id], [SerialNumber], [Model], [Weight], [RegistrationDate]) VALUES (9, N'SL09', N'HEAVYWEIGHT', 450, CAST(N'2022-12-04T16:06:12.890' AS DateTime))
+INSERT [dbo].[Drones] ([Id], [SerialNumber], [Model], [Weight], [RegistrationDate]) VALUES (10, N'SL10', N'LIGHTWEIGHT', 220, CAST(N'2022-12-04T16:06:12.890' AS DateTime))
+
+
+-- Sample Dispatch Master 
+
+INSERT [dbo].[DispatchMaster] ([Id], [DispatchCode], [DroneId], [DispatchStartDate], [DeliveryFrom], [DeliveryTo], [DroneControlBy], [DroneState], [BatteryPercentage], [DispatchCompleteDate], [LogDate]) VALUES (1, N'D0000001', 1, CAST(N'2022-12-04T23:39:56.533' AS DateTime), N'DHK01', N'DHK02', N'SA', N'RETURNING', 66, CAST(N'2022-12-05T02:07:20.707' AS DateTime), CAST(N'2022-12-05T02:07:20.707' AS DateTime))
+INSERT [dbo].[DispatchMaster] ([Id], [DispatchCode], [DroneId], [DispatchStartDate], [DeliveryFrom], [DeliveryTo], [DroneControlBy], [DroneState], [BatteryPercentage], [DispatchCompleteDate], [LogDate]) VALUES (2, N'D0000002', 2, CAST(N'2022-12-05T00:23:04.047' AS DateTime), N'DHK01', N'DHK01', N'SA', N'IDLE', 100, NULL, CAST(N'2022-12-05T00:23:04.047' AS DateTime))
+INSERT [dbo].[DispatchMaster] ([Id], [DispatchCode], [DroneId], [DispatchStartDate], [DeliveryFrom], [DeliveryTo], [DroneControlBy], [DroneState], [BatteryPercentage], [DispatchCompleteDate], [LogDate]) VALUES (3, N'D0000003', 1, CAST(N'2022-12-05T02:17:54.433' AS DateTime), N'DHK99', N'DHK100', N'SA', N'IDLE', 100, NULL, CAST(N'2022-12-05T02:17:54.433' AS DateTime))
+INSERT [dbo].[DispatchMaster] ([Id], [DispatchCode], [DroneId], [DispatchStartDate], [DeliveryFrom], [DeliveryTo], [DroneControlBy], [DroneState], [BatteryPercentage], [DispatchCompleteDate], [LogDate]) VALUES (1002, N'D0000004', 6, CAST(N'2022-12-05T12:32:03.980' AS DateTime), N'DHK99', N'DHK100', N'SA', N'IDLE', 90, CAST(N'2022-12-05T12:36:08.043' AS DateTime), CAST(N'2022-12-05T12:36:08.043' AS DateTime))
+
+-- Sample Dispatch Details
+INSERT [dbo].[DispatchDetails] ([Id], [DispatchCode], [DroneId], [MedicineName], [MedicineWeight], [MedicineCode], [MedicineImage]) VALUES (1, N'D0000001', 1, N'MED01', 90, N'C01', 0x)
+INSERT [dbo].[DispatchDetails] ([Id], [DispatchCode], [DroneId], [MedicineName], [MedicineWeight], [MedicineCode], [MedicineImage]) VALUES (2, N'D0000001', 1, N'MED02', 190, N'C02', 0x)
+INSERT [dbo].[DispatchDetails] ([Id], [DispatchCode], [DroneId], [MedicineName], [MedicineWeight], [MedicineCode], [MedicineImage]) VALUES (3, N'D0000002', 1, N'MED01', 20, N'C01', 0x)
+INSERT [dbo].[DispatchDetails] ([Id], [DispatchCode], [DroneId], [MedicineName], [MedicineWeight], [MedicineCode], [MedicineImage]) VALUES (4, N'D0000003', 1, N'MED2', 100, N'C2', 0x)
+INSERT [dbo].[DispatchDetails] ([Id], [DispatchCode], [DroneId], [MedicineName], [MedicineWeight], [MedicineCode], [MedicineImage]) VALUES (1002, N'D0000004', 1, N'MED2', 100, N'C2', 0x)
+
+
+-- Sample Dispatch History
+INSERT [dbo].[DispatchHistory] ([Id], [DispatchCode], [DroneId], [DispatchStartDate], [DroneState], [BatterPercentage], [DispatchComplateDate], [LogDate]) VALUES (1, N'D0000004', 6, CAST(N'2022-12-05T12:32:03.980' AS DateTime), N'IDLE', 100, NULL, CAST(N'2022-12-05T12:32:03.980' AS DateTime))
+INSERT [dbo].[DispatchHistory] ([Id], [DispatchCode], [DroneId], [DispatchStartDate], [DroneState], [BatterPercentage], [DispatchComplateDate], [LogDate]) VALUES (3, N'D0000004', 6, NULL, N'LOADING', 95, NULL, CAST(N'2022-12-05T12:33:41.527' AS DateTime))
+INSERT [dbo].[DispatchHistory] ([Id], [DispatchCode], [DroneId], [DispatchStartDate], [DroneState], [BatterPercentage], [DispatchComplateDate], [LogDate]) VALUES (4, N'D0000004', 6, NULL, N'LOADED', 90, NULL, CAST(N'2022-12-05T12:34:13.447' AS DateTime))
+INSERT [dbo].[DispatchHistory] ([Id], [DispatchCode], [DroneId], [DispatchStartDate], [DroneState], [BatterPercentage], [DispatchComplateDate], [LogDate]) VALUES (5, N'D0000004', 6, NULL, N'DELIVERING', 90, NULL, CAST(N'2022-12-05T12:35:44.173' AS DateTime))
+INSERT [dbo].[DispatchHistory] ([Id], [DispatchCode], [DroneId], [DispatchStartDate], [DroneState], [BatterPercentage], [DispatchComplateDate], [LogDate]) VALUES (6, N'D0000004', 6, NULL, N'DELIVERED', 90, NULL, CAST(N'2022-12-05T12:35:58.870' AS DateTime))
+INSERT [dbo].[DispatchHistory] ([Id], [DispatchCode], [DroneId], [DispatchStartDate], [DroneState], [BatterPercentage], [DispatchComplateDate], [LogDate]) VALUES (7, N'D0000004', 6, NULL, N'RETURNING', 90, CAST(N'2022-12-05T12:36:08.043' AS DateTime), CAST(N'2022-12-05T12:36:08.043' AS DateTime))

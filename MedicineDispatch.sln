@@ -33,7 +33,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoWrapper", "AutoWrapper\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MedicineDispatch.Common", "MedicineDispatch.Common", "{A444D1B9-C071-496B-8099-596C2C3E7428}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonEnum", "CommonEnum\CommonEnum.csproj", "{D4E3CEE5-6767-4B2B-8DB0-22E4A90FC9B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonEnum", "CommonEnum\CommonEnum.csproj", "{D4E3CEE5-6767-4B2B-8DB0-22E4A90FC9B9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database Script", "Database Script", "{874B7BFE-A25B-4C25-BC31-38CA0E2ACF38}"
+	ProjectSection(SolutionItems) = preProject
+		D:\Dispatch Medicine Published\GeneratedDBScript.txt = D:\Dispatch Medicine Published\GeneratedDBScript.txt
+		D:\Dispatch Medicine Published\OnlySchemaScript.txt = D:\Dispatch Medicine Published\OnlySchemaScript.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

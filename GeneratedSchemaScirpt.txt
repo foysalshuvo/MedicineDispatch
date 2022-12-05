@@ -1,0 +1,482 @@
+USE [master]
+GO
+/****** Object:  Database [MedicineDispatchDB]    Script Date: 12/5/2022 5:20:36 PM ******/
+CREATE DATABASE [MedicineDispatchDB]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'MedicineDispatchDB', FILENAME = N'C:\Users\foysal30254\AppData\Local\Microsoft\Microsoft SQL Server Local DB\Instances\MSSQLLocalDB\MedicineDispatchDB.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'MedicineDispatchDB_log', FILENAME = N'C:\Users\foysal30254\AppData\Local\Microsoft\Microsoft SQL Server Local DB\Instances\MSSQLLocalDB\MedicineDispatchDB.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT
+GO
+ALTER DATABASE [MedicineDispatchDB] SET COMPATIBILITY_LEVEL = 150
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [MedicineDispatchDB].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [MedicineDispatchDB] SET ANSI_NULL_DEFAULT ON 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET ANSI_NULLS ON 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET ANSI_PADDING ON 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET ANSI_WARNINGS ON 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET ARITHABORT ON 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET CURSOR_DEFAULT  LOCAL 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET CONCAT_NULL_YIELDS_NULL ON 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET QUOTED_IDENTIFIER ON 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET  DISABLE_BROKER 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET RECOVERY FULL 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET  MULTI_USER 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [MedicineDispatchDB] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [MedicineDispatchDB] SET ACCELERATED_DATABASE_RECOVERY = OFF  
+GO
+ALTER DATABASE [MedicineDispatchDB] SET QUERY_STORE = OFF
+GO
+USE [MedicineDispatchDB]
+GO
+/****** Object:  Table [dbo].[DispatchDetails]    Script Date: 12/5/2022 5:20:36 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[DispatchDetails](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[DispatchCode] [nvarchar](50) NULL,
+	[DroneId] [int] NULL,
+	[MedicineName] [nvarchar](150) NULL,
+	[MedicineWeight] [float] NULL,
+	[MedicineCode] [nvarchar](50) NULL,
+	[MedicineImage] [varbinary](max) NULL,
+ CONSTRAINT [PK_DispatchDetails] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[DispatchHistory]    Script Date: 12/5/2022 5:20:36 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[DispatchHistory](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[DispatchCode] [nvarchar](50) NOT NULL,
+	[DroneId] [int] NULL,
+	[DispatchStartDate] [datetime] NULL,
+	[DroneState] [nvarchar](50) NULL,
+	[BatterPercentage] [float] NULL,
+	[DispatchComplateDate] [datetime] NULL,
+	[LogDate] [datetime] NULL,
+ CONSTRAINT [PK_DispatchHistory] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[DispatchMaster]    Script Date: 12/5/2022 5:20:36 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[DispatchMaster](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[DispatchCode] [nvarchar](50) NULL,
+	[DroneId] [int] NULL,
+	[DispatchStartDate] [datetime] NULL,
+	[DeliveryFrom] [nvarchar](50) NULL,
+	[DeliveryTo] [nvarchar](50) NULL,
+	[DroneControlBy] [nvarchar](50) NULL,
+	[DroneState] [nvarchar](50) NULL,
+	[BatteryPercentage] [float] NULL,
+	[DispatchCompleteDate] [datetime] NULL,
+	[LogDate] [datetime] NULL,
+ CONSTRAINT [PK_DispatchMaster] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Drones]    Script Date: 12/5/2022 5:20:36 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Drones](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[SerialNumber] [nvarchar](100) NULL,
+	[Model] [nvarchar](50) NULL,
+	[Weight] [float] NULL,
+	[RegistrationDate] [datetime] NULL
+) ON [PRIMARY]
+GO
+/****** Object:  StoredProcedure [dbo].[SP_DISPATCH_MEDICINE]    Script Date: 12/5/2022 5:20:36 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- ===============================================================================
+-- Author		:	Foysal Alam
+-- Create date	:	04 12 2022
+-- Description	:	All Dispatch information operation would be written in here
+-- ===============================================================================
+
+CREATE PROCEDURE [dbo].[SP_DISPATCH_MEDICINE]
+    @Id INT =NULL,
+	@DispatchCode NVARCHAR(50)=NULL,
+	@DroneId INT = NULL,
+	@DispatchStartDate DATETIME = NULL,
+	@DispatchCompleteDate DATETIME = NULL,
+	@DeliveryFrom NVARCHAR(50)=NULL,
+	@DeliveryTo NVARCHAR(50)=NULL,
+	@DroneControlBy NVARCHAR(50)=NULL,
+	@DroneState NVARCHAR(50)=NULL,
+	@BatteryPercentage FLOAT =NULL,
+	@MedicineName NVARCHAR(50)=NULL,
+	@MedicineWeight FLOAT=NULL,
+	@MedicineCode NVARCHAR(50)=NULL,
+	@MedicineImage VARBINARY(MAX)=NULL,
+	@IntQuery INT,
+	@Msg VARCHAR(500) OUTPUT
+AS
+BEGIN
+	IF (@IntQuery = 1) -- 1 is for Save Medicine Dispatch Master Data
+		BEGIN TRY
+		BEGIN TRANSACTION
+		
+		DECLARE @generatedDispatchCode  AS VARCHAR(50)
+			BEGIN
+			DECLARE @LastValue  INT -- newly Added
+
+			SET @LastValue = (
+			        SELECT COUNT(Id)
+			        FROM   [dbo].[DispatchMaster]
+			    )
+		
+		SET @generatedDispatchCode = 'D' + RIGHT('000000' + CONVERT(VARCHAR(MAX), (@LastValue + 1)), 7)
+
+		END
+
+		INSERT INTO [dbo].[DispatchMaster]
+           (DispatchCode
+           ,DroneId
+           ,DispatchStartDate
+           ,DeliveryFrom
+           ,DeliveryTo
+           ,DroneControlBy
+           ,DroneState
+		   ,BatteryPercentage
+		   ,LogDate
+           )
+     VALUES
+           (@generatedDispatchCode
+           ,@DroneId
+           ,GETDATE()
+           ,@DeliveryFrom
+           ,@DeliveryTo
+           ,@DroneControlBy
+           ,@DroneState
+		   ,@BatteryPercentage
+		   ,GETDATE()
+		   )		
+
+		IF @@ERROR = 0 --check @@ERROR variable
+		BEGIN
+		    SET @Msg = 'Status: 000 || Remarks:Success || Reference:' + @generatedDispatchCode;
+			-- Insert History 
+
+					INSERT INTO [dbo].[DispatchHistory]
+					   (DispatchCode
+					   ,DroneId
+					   ,DispatchStartDate
+					   ,DroneState
+					   ,BatterPercentage
+					   ,DispatchComplateDate
+					   ,LogDate
+					   )
+				 VALUES
+					   (@generatedDispatchCode
+					   ,@DroneId
+					   ,GETDATE()
+					   ,@DroneState
+					   ,@BatteryPercentage
+					   ,null
+					   ,GETDATE()
+					   )		
+
+		    COMMIT TRANSACTION --finally, Commit the transaction if Success..
+		END
+	END TRY
+	BEGIN CATCH
+		SET @Msg = 'Status: 999 || Remarks: ' + ERROR_MESSAGE(); --Set error message
+		ROLLBACK TRANSACTION --RollBack Transaction if Error..
+		RETURN
+	END CATCH
+
+	IF (@IntQuery = 2) -- 2 is for Save Medicine Dispatch Details Data
+	BEGIN 
+		INSERT INTO [dbo].[DispatchDetails]
+           (DispatchCode
+		   ,DroneId
+		   ,MedicineName
+           ,MedicineWeight
+           ,MedicineCode
+           ,MedicineImage
+           )
+     VALUES
+           (@DispatchCode
+		   ,@DroneId
+		   ,@MedicineName
+           ,@MedicineWeight
+           ,@MedicineCode
+           ,@MedicineImage
+		   )
+		
+	END
+	
+	IF (@IntQuery = 3) -- 3 is for Getting dispatch medication information
+	BEGIN TRY
+		SELECT dm.Id,
+			   dm.DispatchCode,
+			   dm.DroneId,
+			   dm.DispatchStartDate,
+			   dm.DispatchCompleteDate,
+			   dm.DeliveryFrom,
+			   dm.DeliveryTo,
+			   dm.DroneControlBy,
+			   dm.DroneState,
+			   dm.BatteryPercentage
+		FROM   dbo.DispatchMaster dm WITH (NOLOCK)
+		WHERE  dm.DroneId = @DroneId
+	END TRY
+	BEGIN CATCH
+		SET @Msg = 'Status: 999 || Remarks: ' + ERROR_MESSAGE(); --Set error message
+	END CATCH 
+	
+	IF (@IntQuery = 4) -- 4 is for Getting dispatch medication details information
+	BEGIN TRY
+		SELECT dd.Id,
+			   dd.DispatchCode,
+			   dd.DroneId,
+			   dd.MedicineName,
+			   dd.MedicineWeight,
+			   dd.MedicineCode,
+			   dd.MedicineImage
+		FROM   dbo.DispatchDetails dd WITH (NOLOCK)
+		WHERE  dd.DispatchCode = @DispatchCode
+	END TRY
+	BEGIN CATCH
+		SET @Msg = 'Status: 999 || Remarks: ' + ERROR_MESSAGE(); --Set error message
+	END CATCH 
+
+	IF (@IntQuery = 5) -- 5 is for updating dispatch information
+	BEGIN TRY
+
+	UPDATE DispatchMaster
+		SET 
+		DroneState = CASE WHEN @DroneState='RETURNING' THEN 'IDLE' ELSE @DroneState END,
+		BatteryPercentage =@BatteryPercentage,
+		LogDate =GETDATE(),
+		DispatchCompleteDate = CASE WHEN @DroneState='RETURNING' THEN GETDATE() END
+	WHERE DispatchCode = @DispatchCode AND DroneId=@DroneId
+
+	--- Update History 
+					INSERT INTO [dbo].[DispatchHistory]
+					   (DispatchCode
+					   ,DroneId
+					   ,DroneState
+					   ,BatterPercentage
+					   ,DispatchComplateDate
+					   ,LogDate
+					   )
+				 VALUES
+					   (@DispatchCode
+					   ,@DroneId
+					   ,@DroneState
+					   ,@BatteryPercentage
+					   ,CASE WHEN @DroneState='RETURNING' THEN GETDATE() END
+					   ,GETDATE()
+					   )		
+
+	SET @Msg =  'Status: 000 || Remarks: Success';
+
+	END TRY
+	BEGIN CATCH
+		SET @Msg = 'Status: 999 || Remarks: ' + ERROR_MESSAGE(); --Set error message
+	END CATCH 
+
+	IF (@IntQuery = 6) -- 6 is for Getting available drones for LOADING
+	BEGIN TRY
+		SELECT dm.Id,
+			   dm.DispatchCode,
+			   dm.DroneId,
+			   dm.DispatchStartDate,
+			   dm.DispatchCompleteDate,
+			   dm.DeliveryFrom,
+			   dm.DeliveryTo,
+			   dm.DroneControlBy,
+			   dm.DroneState,
+			   dm.BatteryPercentage
+		FROM   dbo.DispatchMaster dm WITH (NOLOCK)
+		WHERE  dm.DroneState = @DroneState
+	END TRY
+	BEGIN CATCH
+		SET @Msg = 'Status: 999 || Remarks: ' + ERROR_MESSAGE(); --Set error message
+	END CATCH 
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[SP_DRONE]    Script Date: 12/5/2022 5:20:36 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+
+
+-- ===============================================================================
+-- Author		:	Foysal Alam
+-- Create date	:	02 12 2022
+-- Description	:	All Drone information CRUD operation would be written in here
+-- ===============================================================================
+
+CREATE PROCEDURE [dbo].[SP_DRONE]
+    @Id INT =NULL,
+	@SerialNumber NVARCHAR(100)=NULL,
+	@Model NVARCHAR(50)=NULL,
+	@Weight Float = NULL,
+	@RegistrationDate DATETIME=NULL,
+	@IntQuery INT,
+	@Msg VARCHAR(500) OUTPUT
+AS
+BEGIN
+	IF (@IntQuery = 1) -- 1 is for Save Drone
+	BEGIN TRY
+		BEGIN TRANSACTION
+		INSERT INTO dbo.Drones
+           (
+		   SerialNumber,
+		   Model,
+           Weight,
+    	   RegistrationDate
+		  )
+		VALUES
+		  (
+		    @SerialNumber,
+			@Model,
+			@Weight,
+			GETDATE()
+		  )				
+		
+		IF @@ERROR = 0 --check @@ERROR variable
+		BEGIN
+		    SET @Msg =  'Status: 000 || Remarks: Success';
+		    COMMIT TRANSACTION --finally, Commit the transaction if Success..
+		END
+	END TRY
+	BEGIN CATCH
+		SET @Msg = 'Status: 999 || Remarks: ' + ERROR_MESSAGE(); --Set error message
+		ROLLBACK TRANSACTION --RollBack Transaction if Error..
+		RETURN
+	END CATCH
+	
+	IF (@IntQuery = 2) -- 2 is for Getting Drone information by ID
+	BEGIN TRY
+		SELECT drone.Id,
+			   drone.SerialNumber,
+			   drone.Model,
+			   drone.Weight,
+			   drone.RegistrationDate
+		FROM   dbo.Drones drone WITH (NOLOCK)
+		WHERE  drone.Id = @Id
+	END TRY
+	BEGIN CATCH
+		SET @Msg = 'Status: 999 || Remarks: ' + ERROR_MESSAGE(); --Set error message
+	END CATCH 
+
+	IF (@IntQuery = 3) -- 3 is for Update Drone information by ID
+	BEGIN TRY
+		UPDATE dbo.Drones
+		SET
+			   SerialNumber =@SerialNumber,
+			   Model =@Model,
+			   Weight = @Weight
+		WHERE  Id = @Id
+		IF @@ERROR = 0 --check @@ERROR variable
+		BEGIN
+		    SET @Msg =  'Status: 000 || Remarks: Success';
+		END
+	END TRY
+	BEGIN CATCH
+		SET @Msg = 'Status: 999 || Remarks: ' + ERROR_MESSAGE(); --Set error message
+	END CATCH 
+
+	IF (@IntQuery = 4) -- 4 is for Getting All active Drone informations
+	BEGIN TRY
+		SELECT drone.Id,
+			   drone.SerialNumber,
+			   drone.Model,
+			   drone.Weight,
+			   drone.RegistrationDate
+		FROM   dbo.Drones drone WITH (NOLOCK)
+		ORDER BY drone.Id DESC
+		
+	END TRY
+	BEGIN CATCH
+		SET @Msg = 'Status: 999 || Remarks: ' + ERROR_MESSAGE(); --Set error message
+	END CATCH 
+
+END
+GO
+USE [master]
+GO
+ALTER DATABASE [MedicineDispatchDB] SET  READ_WRITE 
+GO

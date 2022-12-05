@@ -23,7 +23,6 @@ namespace Services.Drones
     public class DispatchMedicineService : IDispatchMedicineService
     {
         private IUnitOfWork _unitOfWork;
-
         public DispatchMedicineService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -41,7 +40,6 @@ namespace Services.Drones
             using (var context = _unitOfWork.Create())
             {
 
-                // Get the Drone Information First to get weight limit 
                 var drone = context.Repositories.DronesRepository.GetDroneInformationByDroneId(dispatchMedicine.DroneId);
                 if (drone == null || drone.Id == 0)
                 {
@@ -54,8 +52,6 @@ namespace Services.Drones
                 {
                     if (IsProvidedDroneIsIdle(drone.Id))
                     {
-                        // Checking Medications weight 
-                        // Med weight < drone weight
                         double medicineWeightInTotal = 0;
                         if (dispatchMedicine.Medications.Count > 0)
                         {

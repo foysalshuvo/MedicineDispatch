@@ -113,14 +113,6 @@ namespace UnitOfWork.SqlHelper
             }
         }
 
-        /// <summary>
-        ///  Functionality : Object used to sequentially read from DataSource 
-        ///  Create By     : Foysal Alam
-        ///  Date          : 27.02.2020
-        /// </summary>
-        /// <param name="cmd"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
         public IDataReader GetDataReader(SqlCommand cmd, List<SqlParameter> parameters)
         {
             IDataReader reader = null;
@@ -154,7 +146,6 @@ namespace UnitOfWork.SqlHelper
                 }
             }
         }
-
 
         public void Insert(string commandText, CommandType commandType, SqlParameter[] parameters = null)
         {
@@ -200,14 +191,6 @@ namespace UnitOfWork.SqlHelper
             return lastId;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="commandText"></param>
-        /// <param name="commandType"></param>
-        /// <param name="parameters"></param>
-        /// <param name="lastId"></param>
-        /// <returns></returns>
         public int Insert(SqlCommand cmd, SqlParameter[] parameters, out int loanId)
         {
             try
@@ -338,7 +321,6 @@ namespace UnitOfWork.SqlHelper
 
         }
 
-
         public void InsertWithTransaction(string commandText, CommandType commandType, IsolationLevel isolatiobLevel, SqlParameter[] parameters)
         {
             SqlTransaction transactionScope = null;
@@ -376,26 +358,6 @@ namespace UnitOfWork.SqlHelper
                 }
             }
         }
-
-        //public void Update(string commandText, CommandType commandType, SqlParameter[] parameters)
-        //{
-        //    using (var connection = new SqlConnection(ConnectionString))
-        //    {
-        //        connection.Open();
-        //        using (var command = new SqlCommand(commandText, connection))
-        //        {
-        //            command.CommandType = commandType;
-        //            if (parameters != null)
-        //            {
-        //                foreach (var parameter in parameters)
-        //                {
-        //                    command.Parameters.Add(parameter);
-        //                }
-        //            }
-        //            command.ExecuteNonQuery();
-        //        }
-        //    }
-        //}
 
         public string Update(SqlCommand cmd, SqlParameter[] parameters, out string msg)
         {
